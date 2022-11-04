@@ -1,0 +1,16 @@
+﻿@code {
+    [Parameter]
+    public Exception Exception { get; set; }
+    [Parameter]
+    public ErrorBoundary ErrorBoundary { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        SnackBar.Add(Exception.Message, Severity.Error);
+
+        ErrorBoundary?.Recover();
+    }
+
+}

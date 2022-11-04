@@ -1,6 +1,7 @@
-﻿using SampleApp.Server.Domain.Exceptions;
+﻿using SampleApp.Server.Application.Exceptions;
+using SampleApp.Server.Domain.Exceptions;
+using SampleApp.Shared.ResponseModels.Error;
 using System.Net;
-using System.Text.Json;
 
 namespace SampleApp.Server.Middleware;
 
@@ -23,7 +24,7 @@ public class ExceptionHandlingMiddleware
         {
             await HandleUserExceptionAsync(httpContext, ex);
         }
-        catch (ApplicationException ex)
+        catch (AppException ex)
         {
             await HandleUserExceptionAsync(httpContext, ex);
         }
@@ -38,7 +39,7 @@ public class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        var errorDetails = new ErrorDetails()
+        var errorDetails = new ErrorDetailsResponseModel()
         {
             Message = "Internal Server Error. Please try again in a moment"
         };
@@ -50,7 +51,7 @@ public class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        var errorDetails = new ErrorDetails()
+        var errorDetails = new ErrorDetailsResponseModel()
         {
             Message = exception.Message
         };
@@ -59,12 +60,3 @@ public class ExceptionHandlingMiddleware
     }
 }
 
-public class ErrorDetails
-{
-    public string Message { get; set; }
-
-    public override string ToString()
-    {
-        return JsonSerializer.Serialize(this);
-    }
-}

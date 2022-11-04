@@ -6,8 +6,10 @@ using SampleApp.Server.Domain.Entities;
 using SampleApp.Server.Domain.Enums;
 using SampleApp.Server.Infrastructure.Constants;
 using SampleApp.Server.Infrastructure.Persistence;
+using SampleApp.Shared.DTOs.Products;
 using SampleApp.Shared.RequestModels.Products;
 using SampleApp.Shared.ResponseModels.Products;
+using SampleApp.Server.Application.Exceptions;
 
 namespace SampleApp.Server.Infrastructure.Services;
 internal class ProductService : IProductService
@@ -29,7 +31,7 @@ internal class ProductService : IProductService
             "Cloth" => ProductTypes.Cloth,
             "Food" => ProductTypes.Food,
             "Sport" => ProductTypes.Sport,
-            _ => throw new ApplicationException("Invalid Product Type")
+            _ => throw new AppException("Invalid Product Type")
         };
 
         return productType;
@@ -53,7 +55,7 @@ internal class ProductService : IProductService
         var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId, cancellationToken: cancellationToken);
 
         if (product is null)
-            throw new ApplicationException("Invalid Product Id. Product not found");
+            throw new AppException("Invalid Product Id. Product not found");
 
         var productOldImage = product.ImageName;
         var productNewImageName = product.ImageName;
@@ -75,7 +77,7 @@ internal class ProductService : IProductService
         var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId, cancellationToken: cancellationToken);
 
         if (product is null)
-            throw new ApplicationException("Invalid Product Id. Product not found");
+            throw new AppException("Invalid Product Id. Product not found");
 
         product.AddNewStock(quantity);
 
@@ -87,22 +89,19 @@ internal class ProductService : IProductService
         var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId, cancellationToken: cancellationToken);
 
         if (product is null)
-            throw new ApplicationException("Invalid Product Id. Product not found");
+            throw new AppException("Invalid Product Id. Product not found");
 
         product.RemoveFromStock(quantity);
 
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<ProductInfoResponseModel>> GetAllProductsAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<GetAllProductsDto> GetAllProductsAsync(int page, int pageSize, CancellationToken cancellationToken = default)
     {
         page = (page <= 0) ? 1 : page;
         pageSize = (pageSize <= 0) ? CommonConstants.DefaultPageSize : pageSize;
 
-        var result = await _context.Products
-            .OrderBy(x => x.Id)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+        var query = _context.Products
             .Select(x => new ProductInfoResponseModel()
             {
                 ProductId = x.Id,
@@ -111,10 +110,20 @@ internal class ProductService : IProductService
                 AvailableStock = x.AvailableStock,
                 SellableStock = x.SellableStock,
                 ImageUrl = _configuration[CommonConstants.ImageStorageBasePathConfigName] + x.ImageName
-            })
+            });
+
+        var totalCount = await query.CountAsync(cancellationToken: cancellationToken);
+        var products = await query
+            .OrderBy(x => x.ProductId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return result;
+        return new GetAllProductsDto()
+        {
+            TotalAvailableRecords = totalCount,
+            Products = products
+        };
     }
 
     public async Task<ProductInfoResponseModel> GetProductByIdAsync(int productId, CancellationToken cancellationToken = default)
@@ -133,7 +142,7 @@ internal class ProductService : IProductService
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
         if (product is null)
-            throw new ApplicationException("Invalid Product Id. Product not found");
+            throw new AppException("Invalid Product Id. Product not found");
 
         return product;
     }
