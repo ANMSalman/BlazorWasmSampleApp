@@ -1,0 +1,23 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="@Quantity" FullWidth="true" Variant="Variant.Outlined" Label="Quantity *"></MudTextField>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Submit">Submit</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private int Quantity { get; set; }
+
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(Quantity));
+    void Cancel() => MudDialog.Cancel();
+}

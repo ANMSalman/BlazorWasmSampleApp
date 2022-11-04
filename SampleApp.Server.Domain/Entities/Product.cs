@@ -22,12 +22,18 @@ public class Product
     public int AvailableStock { get; private set; }
     public string ImageName { get; private set; }
     public int SellableStock { get; private set; }
+    public bool IsDeleted { get; private set; }
 
     private void ValidateSellableQtyAndThrowIfInvalid()
     {
         if (SellableStock <= 0)
             throw new DomainException(
                 $"Available stock must be greater than {ProductConstants.AvailableAndSellableQtyVariance}");
+    }
+
+    public void MarkAsDeleted()
+    {
+        IsDeleted = true;
     }
 
     public void UpdateBasicInfo(string name, ProductTypes productType, string imageName)

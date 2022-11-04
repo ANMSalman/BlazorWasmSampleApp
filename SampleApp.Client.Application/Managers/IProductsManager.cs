@@ -10,4 +10,5 @@ public interface IProductsManager : IManagerBase<ProductInfoResponseModel>
     Task UpdateProductBasicInfoAsync(int productId, UpdateProductBasicInfoRequestModel model);
     Task AddNewStockAsync(int productId, int quantity);
     Task RemoveFromStockAsync(int productId, int quantity);
+    Task DeleteProductAsync(int productId);
 }

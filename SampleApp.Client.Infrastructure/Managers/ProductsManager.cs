@@ -66,6 +66,8 @@ internal class ProductsManager : ManagerBase<ProductInfoResponseModel>, IProduct
 
         if (!response.IsSuccessStatusCode)
             await HandleError(response);
+
+        await LoadProductsAsync(CurrentPage, PageSize);
     }
 
     public async Task UpdateProductBasicInfoAsync(int productId, UpdateProductBasicInfoRequestModel model)
@@ -77,6 +79,8 @@ internal class ProductsManager : ManagerBase<ProductInfoResponseModel>, IProduct
 
         if (!response.IsSuccessStatusCode)
             await HandleError(response);
+
+        await LoadProductsAsync(CurrentPage, PageSize);
     }
 
     public async Task AddNewStockAsync(int productId, int quantity)
@@ -88,6 +92,8 @@ internal class ProductsManager : ManagerBase<ProductInfoResponseModel>, IProduct
 
         if (!response.IsSuccessStatusCode)
             await HandleError(response);
+
+        await LoadProductsAsync(CurrentPage, PageSize);
     }
 
     public async Task RemoveFromStockAsync(int productId, int quantity)
@@ -99,5 +105,19 @@ internal class ProductsManager : ManagerBase<ProductInfoResponseModel>, IProduct
 
         if (!response.IsSuccessStatusCode)
             await HandleError(response);
+
+        await LoadProductsAsync(CurrentPage, PageSize);
+    }
+
+    public async Task DeleteProductAsync(int productId)
+    {
+        var response =
+            await _httpClient.DeleteAsync(
+                RouteConstants.ProductsRoutes.DeleteProduct(productId));
+
+        if (!response.IsSuccessStatusCode)
+            await HandleError(response);
+
+        await LoadProductsAsync(CurrentPage, PageSize);
     }
 }

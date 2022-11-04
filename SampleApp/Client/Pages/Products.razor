@@ -1,0 +1,60 @@
+﻿@page "/products"
+
+
+<MudText Typo="Typo.h4" Align="Align.Center">Products Management</MudText>
+
+<MudCard Class="mt-6">
+    <MudCardContent>
+        <MudButton OnClick="@OnRefresh" Class="mt-1" Color="Color.Info" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" ButtonType="ButtonType.Button">Refresh</MudButton>
+        <MudButton OnClick="@OnCreateNew" Class="mt-1 ml-1" Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" ButtonType="ButtonType.Button">Create New</MudButton>
+    </MudCardContent>
+</MudCard>
+
+@if (_isLoading)
+{
+    <LoadingAnimation />
+}
+else if (ProductsManager.Data is null || ProductsManager.Data.Count == 0)
+{
+    <MudText Class="mt-6" Typo="Typo.h6" Align="Align.Center">No Product found.</MudText>
+}
+else
+{
+    <MudGrid Class="mt-6">
+        <MudItem xs="12">
+            <MudTable Items="ProductsManager.Data" Hover="true" Breakpoint="Breakpoint.Xs" RightAlignSmall="true" Context="product">
+                <HeaderContent>
+                    <MudTh>Id</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Product Type</MudTh>
+                    <MudTh>Available Stock</MudTh>
+                    <MudTh>Sellable Stock</MudTh>
+                    <MudTh>Image URL</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Id">@product.ProductId</MudTd>
+                    <MudTd DataLabel="Name">@product.Name</MudTd>
+                    <MudTd DataLabel="Product Type">@product.ProductType</MudTd>
+                    <MudTd DataLabel="Available Stock">@product.AvailableStock</MudTd>
+                    <MudTd DataLabel="Sellable Stock">@product.SellableStock</MudTd>
+                    <MudTd DataLabel="Image URL">@product.ImageUrl</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudTooltip Text="Edit Product">
+                            <MudFab Class="ml-1 mt-1" OnClick="@(() => OnEditBasicDetails(product.ProductId))" Icon="@Icons.Material.Filled.Edit" Color="Color.Info" Size="Size.Small" />
+                        </MudTooltip>
+                        <MudTooltip Text="Add New Stock">
+                            <MudFab Class="ml-1 mt-1" OnClick="@(() => OnAddNewStock(product.ProductId))" Icon="@Icons.Material.Filled.AddCircle" Color="Color.Success" Size="Size.Small" />
+                        </MudTooltip>
+                        <MudTooltip Text="Remove From Stock">
+                            <MudFab Class="ml-1 mt-1" OnClick="@(() => OnRemoveFromStock(product.ProductId))" Icon="@Icons.Material.Filled.RemoveCircle" Color="Color.Warning" Size="Size.Small" />
+                        </MudTooltip>
+                        <MudTooltip Text="Delete Product">
+                            <MudFab Class="ml-1 mt-1" OnClick="@(() => OnDelete(product.ProductId, product.Name))" Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" Size="Size.Small" />
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+}

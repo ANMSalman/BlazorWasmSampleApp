@@ -12,6 +12,9 @@ internal static class RouteConstants
         internal static string GetProductById(int productId) =>
             $"{BaseEndpoint}/{productId}";
 
+        internal static string DeleteProduct(int productId) =>
+            $"{BaseEndpoint}/{productId}";
+
         internal const string CreateProduct = $"{BaseEndpoint}";
 
         internal static string UpdateProductBasicDetails(int productId) =>

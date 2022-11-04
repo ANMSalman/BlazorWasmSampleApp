@@ -11,5 +11,6 @@ public interface IProductService
     Task RemoveFromStockAsync(int productId, int quantity, CancellationToken cancellationToken = default);
     Task<GetAllProductsDto> GetAllProductsAsync(int page, int pageSize, CancellationToken cancellationToken = default);
     Task<ProductInfoResponseModel> GetProductByIdAsync(int productId, CancellationToken cancellationToken = default);
+    Task DeleteProductAsync(int productId, CancellationToken cancellationToken = default);
 
 }

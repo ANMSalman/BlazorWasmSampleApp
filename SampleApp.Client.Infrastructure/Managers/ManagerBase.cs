@@ -16,6 +16,6 @@ internal abstract class ManagerBase<T> : IManagerBase<T>
     {
         var error = await response.Content.ReadFromJsonAsync<ErrorDetailsResponseModel>();
 
-        throw new ClientException(error!.Message);
+        throw new ClientException(error?.Message ?? "Something went wrong. Please check your internet connection or try again in a moment.");
     }
 }

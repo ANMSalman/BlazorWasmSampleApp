@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SampleApp.Server.Application.Common;
+using SampleApp.Server.Application.Exceptions;
 using SampleApp.Server.Application.Services;
 using SampleApp.Server.Domain.Entities;
 using SampleApp.Server.Domain.Enums;
@@ -9,7 +10,6 @@ using SampleApp.Server.Infrastructure.Persistence;
 using SampleApp.Shared.DTOs.Products;
 using SampleApp.Shared.RequestModels.Products;
 using SampleApp.Shared.ResponseModels.Products;
-using SampleApp.Server.Application.Exceptions;
 
 namespace SampleApp.Server.Infrastructure.Services;
 internal class ProductService : IProductService
@@ -52,7 +52,7 @@ internal class ProductService : IProductService
 
     public async Task UpdateProductBasicInfoAsync(int productId, UpdateProductBasicInfoRequestModel model, CancellationToken cancellationToken = default)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId, cancellationToken: cancellationToken);
+        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId && !x.IsDeleted, cancellationToken: cancellationToken);
 
         if (product is null)
             throw new AppException("Invalid Product Id. Product not found");
@@ -74,7 +74,7 @@ internal class ProductService : IProductService
 
     public async Task AddNewStockAsync(int productId, int quantity, CancellationToken cancellationToken = default)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId, cancellationToken: cancellationToken);
+        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId && !x.IsDeleted, cancellationToken: cancellationToken);
 
         if (product is null)
             throw new AppException("Invalid Product Id. Product not found");
@@ -86,7 +86,7 @@ internal class ProductService : IProductService
 
     public async Task RemoveFromStockAsync(int productId, int quantity, CancellationToken cancellationToken = default)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId, cancellationToken: cancellationToken);
+        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId && !x.IsDeleted, cancellationToken: cancellationToken);
 
         if (product is null)
             throw new AppException("Invalid Product Id. Product not found");
@@ -102,6 +102,7 @@ internal class ProductService : IProductService
         pageSize = (pageSize <= 0) ? CommonConstants.DefaultPageSize : pageSize;
 
         var query = _context.Products
+            .Where(x => !x.IsDeleted)
             .Select(x => new ProductInfoResponseModel()
             {
                 ProductId = x.Id,
@@ -129,7 +130,7 @@ internal class ProductService : IProductService
     public async Task<ProductInfoResponseModel> GetProductByIdAsync(int productId, CancellationToken cancellationToken = default)
     {
         var product = await _context.Products
-            .Where(x => x.Id == productId)
+            .Where(x => x.Id == productId && !x.IsDeleted)
             .Select(x => new ProductInfoResponseModel()
             {
                 ProductId = x.Id,
@@ -145,5 +146,17 @@ internal class ProductService : IProductService
             throw new AppException("Invalid Product Id. Product not found");
 
         return product;
+    }
+
+    public async Task DeleteProductAsync(int productId, CancellationToken cancellationToken = default)
+    {
+        var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId && !x.IsDeleted, cancellationToken: cancellationToken);
+
+        if (product is null)
+            throw new AppException("Invalid Product Id. Product not found");
+
+        product.MarkAsDeleted();
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

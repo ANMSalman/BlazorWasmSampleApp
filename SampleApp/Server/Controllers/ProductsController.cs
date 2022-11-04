@@ -67,4 +67,13 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpDelete("{productId}")]
+    public async Task<IActionResult> RemoveFromStockAsync([FromRoute] int productId,
+        CancellationToken cancellationToken)
+    {
+        await _productService.DeleteProductAsync(productId, cancellationToken);
+
+        return NoContent();
+    }
 }
