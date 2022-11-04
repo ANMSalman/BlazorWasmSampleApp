@@ -5,5 +5,5 @@ public interface IManagerBase<T>
     public int CurrentPage { get; }
     public int PageSize { get; }
     public int TotalAvailableRecords { get; }
-    public bool HasMoreRecords { get; }
+    public int AvailablePageCount { get; }
 }

@@ -36,7 +36,7 @@ internal class ProductsManager : ManagerBase<ProductInfoResponseModel>, IProduct
         CurrentPage = page;
         PageSize = pageSize;
         TotalAvailableRecords = result.TotalAvailableRecords;
-        HasMoreRecords = (page * pageSize) < TotalAvailableRecords;
+        AvailablePageCount = (int)Math.Ceiling((decimal)TotalAvailableRecords / (decimal)pageSize);
     }
 
     public async Task<ProductInfoResponseModel> GetProductByIdAsync(int productId)

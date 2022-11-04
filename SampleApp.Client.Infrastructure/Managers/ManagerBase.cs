@@ -10,7 +10,7 @@ internal abstract class ManagerBase<T> : IManagerBase<T>
     public int CurrentPage { get; protected set; }
     public int PageSize { get; protected set; }
     public int TotalAvailableRecords { get; protected set; }
-    public bool HasMoreRecords { get; protected set; }
+    public int AvailablePageCount { get; protected set; }
 
     protected async Task HandleError(HttpResponseMessage response)
     {
